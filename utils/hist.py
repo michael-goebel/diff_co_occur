@@ -75,7 +75,9 @@ class Hist(torch.autograd.Function):
 										# indices must be remembered, and values associated with them should not be counted
 
 		# Below: pack tuple of ints into single int. Ex, if n_bins is 4, N=3, then (1,2,3) -> 1*16 + 2*4 + 3*1 = 27, like np.ravel_multi_index
-		labels_pack = torch.matmul(labels.reshape(M*K,N), (n_bins**torch.arange(N-1,-1,-1)).double()).view(M,K).long()
+		packing_strides = (n_bins**torch.arange(N-1,-1,-1)).double().to(labels.device)
+		labels_pack = torch.matmul(labels.reshape(M*K,N), packing_strides).view(M,K).long()
+		#labels_pack = torch.matmul(labels.reshape(M*K,N), (n_bins**torch.arange(N-1,-1,-1)).double()).view(M,K).long()
 
 		deltas = x[:,None,:] - labels	# For each neighbor, compute distance along each dimension
 		f_d = func.f(deltas)		# Apply forward interpolation function
