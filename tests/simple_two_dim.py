@@ -2,11 +2,6 @@ import torch
 import numpy as np
 import matplotlib.pyplot as plt
 import sys, os
-import sys, os
-sys.path.append('../utils/')
-from hist import RaisedCos, L1Dist, Hist, hist_tree, hist_loss
-
-
 sys.path.append('../utils/')
 from hist import RaisedCos, L1Dist, Hist, hist_tree, hist_loss
 

@@ -9,10 +9,11 @@ from hist import RaisedCos, L1Dist, Hist, hist_tree, hist_loss
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str()
 
+# X1 is source, X2 is target. Demostrates problem of transporting from 0 to 6
 X1 = torch.tensor([0,0,1,2,3,4,5,6]).view(-1,1).double()
 X2 = torch.tensor([0,1,2,3,4,5,6,6]).view(-1,1).double()
-
 X1.requires_grad = True
+
 
 n_bins = 8
 n_layers = 4
