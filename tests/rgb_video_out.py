@@ -71,7 +71,6 @@ for i in range(n_steps):
 	X1 = img2pairs(I1)
 	H1 = [hist_tree(X1_i,**ht_params) for X1_i in X1]
 	loss = sum([hist_loss(H1_i,H2_i) for H1_i, H2_i in zip(H1,H2)])
-	#print(loss)
 	loss.backward()
 	optimizer.step()
 	I1.data = torch.clamp(I1,0,hist_params['n_bins']-1)
@@ -82,14 +81,9 @@ for i in range(n_steps):
 		col_labels = ['Source', 'Solution', 'Target']
 		row_labels = ['Image', 'Red', 'Green', 'Blue']
 		X_list = [I.detach().cpu() for I in [I1_orig, I1, I2]]
-#		C_list = [Hist.apply(X_i,hist_params['n_bins'],hist_params['interp']) for X in X_list for X_i in img2pairs(X)]
 		C_list = [[Hist.apply(X_i,hist_params['n_bins'],hist_params['interp']) for X_i in img2pairs(X)] for X in X_list]
-		#print(len(C_list))
-		#print(len(C_list[0]))
-
 
 		img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
-		#cc_rmse = torch.sqrt(torch.mean((C_list[1]-C_list[2])**2))
 		cc_rmse = torch.sqrt(torch.mean(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])**2))
 
 		print(f'{i} of {n_steps}\nLoss: {loss:.2f}\nImg RMSE: {img_rmse:0.3f}\n CC RMSE: {cc_rmse:0.3f}\n')
@@ -97,29 +91,22 @@ for i in range(n_steps):
 		fig,axes = plt.subplots(4,3)
 
 		for a, X in zip(axes[0],X_list): a.imshow(X.numpy()/255)
-			#print(X.max())
-		#for a, C in zip(axes[1],C_list): a.imshow(np.log(1+C.numpy()))
 		for ax_col, C_col in zip(axes[1:].T,C_list):
 			for a, C in zip(ax_col, C_col):
-				#print(C.shape)
 				a.imshow(np.log(1+C.numpy()))
 
 		for a, l in zip(axes[0],col_labels): a.set_title(l)
-
 		for a, l in zip(axes[:,0],row_labels): a.set_ylabel(l)
-
 		for a in axes.reshape(-1): a.set_xticks([]); a.set_yticks([])
 
 		fig.suptitle(f'Step {i} of {n_steps}')
-		#axes[0,0].set_ylabel(f'Image\nRMSE: {img_rmse:0.3f}')
-		fig.text(0.02,0.02,f'Image RMSE: {img_rmse:0.3f}\nCC RMSE: {cc_rmse:0.3f}',fontsize=14)
-		#axes[1,0].set_ylabel(f'Co Occurrence\nRMSE: {cc_rmse:0.3f}')
+		fig.text(0.02,0.02,f'Image RMSE: {img_rmse:0.3f}\nCo-Occur RMSE: {cc_rmse:0.3f}',fontsize=14)
 		fig.set_size_inches(8,8)
-		plt.show()
-		quit()
-#
-#		fig.savefig(os.path.join(out_dir,f'{i//n_print:03d}.png'))
-#		plt.close()
+
+
+		fig.savefig(os.path.join(out_dir,f'{i//n_print:03d}.png'))
+		plt.close()
+
 
 os.chdir(out_dir)
 subprocess.call(['convert', '-delay', '30', '*.png', 'out.mp4'])
