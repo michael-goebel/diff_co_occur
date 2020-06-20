@@ -19,6 +19,7 @@ def hist_loss(H1,H2): return sum([(2**i)*torch.sum(torch.abs(h1-h2)) for i,(h1,h
 class MyFunc:
 	bound = 1
 	bound_inc = True
+	neigh_dtype = torch.float32	# non-ideal situation, labels must be packed using matmul, which only accepts float on cuda
 
 	def mask(self,x):	# return a mask, indicating for each point if it is in the nonzero neighborhood
 		if self.bound_inc: return torch.abs(x) <= self.bound
@@ -26,15 +27,15 @@ class MyFunc:
 
 	def neighs(self,x):	# return list of neighbors for each point
 		b = math.ceil(self.bound)
-		return [torch.floor(x-i) for i in range(-b,b+1)]
+		return [torch.floor(x-i).type(self.neigh_dtype) for i in range(-b,b+1)]
 
 class RaisedCos(MyFunc):
-	def f(self,x): return (1+torch.cos(x*pi))/2*(self.mask(x).double())
-	def df(self,x): return (-pi/2)*torch.sin(x*pi)*(self.mask(x).double())
+	def f(self,x): return (1+torch.cos(x*pi))/2*(self.mask(x).type(x.dtype))
+	def df(self,x): return (-pi/2)*torch.sin(x*pi)*(self.mask(x).type(x.dtype))
 
 class L1Dist(MyFunc):
-	def f(self,x): return (1-torch.abs(x))*( (x < self.bound).double() + (x <= self.bound).double())/2
-	def df(self,x): return torch.sign(-x)*((torch.abs(x) < self.bound).double()+(torch.abs(x) <= self.bound).double())/2
+	def f(self,x): return (1-torch.abs(x))*( (x < self.bound).type(x.dtype) + (x <= self.bound).type(x.dtype))/2
+	def df(self,x): return torch.sign(-x)*((torch.abs(x) < self.bound).type(x.dtype)+(torch.abs(x) <= self.bound).type(x.dtype))/2
 
 
 default_interp = RaisedCos()
@@ -57,8 +58,6 @@ class Hist(torch.autograd.Function):
 	@staticmethod
 	def forward(ctx,x,n_bins,func=default_interp):
 		M, N = x.shape
-		#noise = sigma*torch.randn(x.shape).double()
-		#noisy_input = torch.clamp(x+noise,0,n_bins-1)	# add noise to input and clamp		
 		clamped_input = torch.clamp(x,0,n_bins-1)
 		labels = torch.stack(func.neighs(clamped_input))	# This stack gives P 1D neighbors for each dimension
 		P = labels.shape[0]
@@ -75,13 +74,12 @@ class Hist(torch.autograd.Function):
 										# indices must be remembered, and values associated with them should not be counted
 
 		# Below: pack tuple of ints into single int. Ex, if n_bins is 4, N=3, then (1,2,3) -> 1*16 + 2*4 + 3*1 = 27, like np.ravel_multi_index
-		packing_strides = (n_bins**torch.arange(N-1,-1,-1)).double().to(labels.device)
+		packing_strides = (n_bins**torch.arange(N-1,-1,-1)).type(labels.dtype).to(labels.device)
 		labels_pack = torch.matmul(labels.reshape(M*K,N), packing_strides).view(M,K).long()
-		#labels_pack = torch.matmul(labels.reshape(M*K,N), (n_bins**torch.arange(N-1,-1,-1)).double()).view(M,K).long()
 
-		deltas = x[:,None,:] - labels	# For each neighbor, compute distance along each dimension
-		f_d = func.f(deltas)		# Apply forward interpolation function
-		df_d = func.df(deltas)		# Apply derivative interpolation function (not used in forward but saved for backward)
+		deltas = x[:,None,:] - labels.type(x.dtype)	# For each neighbor, compute distance along each dimension
+		f_d = func.f(deltas)				# Apply forward interpolation function
+		df_d = func.df(deltas)				# Apply derivative interpolation function (not used in forward but saved for backward)
 
 		f_d[inds_invalid] = 0		# since computations of output are all summations, zeroing the values associated with invalid
 		df_d[inds_invalid] = 0		# indices will "remove" them, while maintaining fixed tensor shape
