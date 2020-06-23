@@ -18,7 +18,7 @@ X1.requires_grad = True
 n_bins = 8
 n_layers = 4
 sigma = 0.001
-interp = RaisedCos()
+interp = 'raised cos'
 n_steps = 200
 optim_params = {'lr': 0.001, 'momentum': 0.9}
 

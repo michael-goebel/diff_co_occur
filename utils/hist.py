@@ -38,7 +38,7 @@ class L1Dist(MyFunc):
 	def df(self,x): return torch.sign(-x)*((torch.abs(x) < self.bound).type(x.dtype)+(torch.abs(x) <= self.bound).type(x.dtype))/2
 
 
-default_interp = RaisedCos()
+interp_dict = {'raised cos': RaisedCos(), 'L1 dist': L1Dist()}
 
 
 class Hist(torch.autograd.Function):
@@ -56,7 +56,8 @@ class Hist(torch.autograd.Function):
 	"""
 
 	@staticmethod
-	def forward(ctx,x,n_bins,func=default_interp):
+	def forward(ctx,x,n_bins,func_name='raised cos'):
+		func = interp_dict[func_name]
 		M, N = x.shape
 		clamped_input = torch.clamp(x,0,n_bins-1)
 		labels = torch.stack(func.neighs(clamped_input))	# This stack gives P 1D neighbors for each dimension
@@ -131,7 +132,8 @@ def hist_integer(x,n_bins):
 if __name__ == '__main__':
 
 
-	interp = RaisedCos()
+	interp_name = 'raised cos'
+	interp = interp_dict[interp_name]
 	#interp = L1Dist()
 	torch.manual_seed(123)
 
@@ -148,7 +150,7 @@ if __name__ == '__main__':
 	hist_list = [
 		lambda x: hist_integer(x,n_bins),
 		lambda x: hist_brute_force(x,n_bins,interp),
-		lambda x: Hist.apply(x,n_bins,interp)
+		lambda x: Hist.apply(x,n_bins,interp_name)
 	]
 	names = ['int_cast', 'brute_force', 'efficient']
 
