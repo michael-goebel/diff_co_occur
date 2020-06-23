@@ -22,7 +22,7 @@ interp = RaisedCos()
 n_steps = 200
 optim_params = {'lr': 0.001, 'momentum': 0.9}
 
-H2 = hist_tree(X2,Hist,n_bins,n_layers,interp)
+H2 = hist_tree(X2,n_bins,n_layers,interp)
 optimizer = torch.optim.SGD((X1,),**optim_params)
 X_list = list()
 
@@ -34,7 +34,7 @@ for i in range(n_steps):
 	X1.data = X1.data + sigma*torch.randn(X1.shape).double()
 	X1_clamp = torch.clamp(X1,0,n_bins-1)
 	X_list.append(X1_clamp.detach().numpy())
-	H1 = hist_tree(X1_clamp,Hist,n_bins,n_layers,interp)
+	H1 = hist_tree(X1_clamp,n_bins,n_layers,interp)
 
 	loss = hist_loss(H1,H2)
 	loss.backward()

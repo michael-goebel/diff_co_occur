@@ -27,7 +27,7 @@ n_steps = 200
 lamb = 0
 optim_params = {'lr': 0.001, 'momentum': 0.9}
 
-H2 = hist_tree(X2,Hist,n_bins,n_layers,interp)
+H2 = hist_tree(X2,n_bins,n_layers,interp)
 optimizer = torch.optim.SGD((X1,),**optim_params)
 X_list = list()
 
@@ -38,7 +38,7 @@ for i in range(n_steps):
 	X1.data = torch.clamp(X1+sigma*torch.randn(X1.shape).double(),0,n_bins-1)
 
 	X_list.append(X1.detach().numpy())
-	H1 = hist_tree(X1,Hist,n_bins,n_layers,interp)
+	H1 = hist_tree(X1,n_bins,n_layers,interp)
 	loss = hist_loss(H1,H2) + lamb*torch.sum((X1-X1_orig)**2)
 
 	loss.backward()
