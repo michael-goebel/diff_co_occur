@@ -7,9 +7,11 @@ import os
 pi = torch.tensor(math.pi)
 
 
+# Makes an "image pyramid" of the ND histograms
 def hist_tree(X,n_bins,n_layers,interp):
         return [Hist.apply(X/(2**i),n_bins//(2**i)+1,interp) for i in range(n_layers)]
 
+# Loss on the hist_tree, sum L1 losses weighted by the downsampling factor at each scale
 def hist_loss(H1,H2): return sum([(2**i)*torch.sum(torch.abs(h1-h2)) for i,(h1,h2) in enumerate(zip(H1,H2))])
 
 

@@ -5,7 +5,9 @@ from hist import hist_tree, hist_loss
 from tqdm import trange
 import matplotlib.pyplot as plt
 
+
 def img2pairs(X): return [torch.stack((X[:-1,:,i].view(-1),X[1:,:,i].view(-1)),dim=1) for i in range(X.shape[-1])]
+
 
 def co_occur(X,ht_params): return [hist_tree(X_i,ht_params['n_bins'],1,ht_params['interp'])[0] for X_i in img2pairs(X)]
 
@@ -16,7 +18,6 @@ def run_alg(I1,I1_orig,I2,ht_params,optim_params,n_steps,sigma,lamb,verbose):
 	optimizer = torch.optim.SGD((I1,),**optim_params)
 	H2 = [hist_tree(X2_i,**ht_params) for X2_i in img2pairs(I2)]
 	my_range = trange if verbose else range
-
 
 	for i in my_range(n_steps):
 		optimizer.zero_grad()
@@ -34,10 +35,6 @@ def savefig(I1_orig,I1,I2,title,ht_params,filename):
 	col_labels = ['Source', 'Solution', 'Target']
 	row_labels = ['Image', 'Red', 'Green', 'Blue']
 	X_list = [I.detach() for I in [I1_orig, I1, I2]]
-#	 hist_params = ht_params.copy()
-#	 hist_params['n_layers'] = 1
-
-#	 C_list = [[hist_tree(X_i,**hist_params)[0] for X_i in img2pairs(X)] for X in X_list]
 	C_list = [co_occur(X,ht_params) for X in X_list]
 
 	img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
