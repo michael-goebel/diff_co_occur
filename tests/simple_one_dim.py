@@ -16,7 +16,7 @@ X1.requires_grad = True
 
 
 n_bins = 8
-n_layers = 4
+n_layers = 1
 sigma = 0.001
 interp = 'raised cos'
 n_steps = 200

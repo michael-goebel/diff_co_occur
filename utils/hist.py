@@ -69,7 +69,7 @@ class Hist(torch.autograd.Function):
 
 		labels = labels.transpose(0,2).transpose(1,2)	# premutes axes
 		K = labels.shape[1]
-
+		
 		inds_invalid = ((labels < 0) | (labels >= n_bins)).any(2)	# by default consider all neighbors. Then check if they are outside valid range
 		labels[inds_invalid] = 0					# if invalid, replace with some valid index (I close 1). Later on, these invalid
 										# indices must be remembered, and values associated with them should not be counted
