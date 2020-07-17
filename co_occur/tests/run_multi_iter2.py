@@ -11,11 +11,11 @@ from pre_proc import CenterCrop
 from image_reader import image_reader
 
 
-ap_list = [{'n_steps': 10, 'sigma': 0.01, 'lamb': 0},
-	   {'n_steps': 10, 'sigma': 0.01, 'lamb': 0},
-	   {'n_steps': 10, 'sigma': 0.0, 'lamb': 0}]
+ap_list = [{'n_steps': 200, 'sigma': 0.01, 'lamb': 0},
+	   {'n_steps': 200, 'sigma': 0.01, 'lamb': 0},
+	   {'n_steps': 100, 'sigma': 0.0, 'lamb': 0}]
 
-n_save = 5
+n_save = 10
 output_dir = 'outputs2/'
 
 ht_params = {'n_layers': 9, 'n_bins': 256, 'interp': 'raised cos'}
@@ -35,7 +35,7 @@ print(f'Using device: {device}')
 
 
 
-for fake_img, real_img in fake_real_tuples:
+for fake_img, real_img in fake_real_tuples[5:20]:
 
 	out_dir_i = os.path.join(output_dir,fake_img.split('/')[-1].split('.')[0])
 
@@ -59,22 +59,4 @@ for fake_img, real_img in fake_real_tuples:
 		print(index, get_losses(I1_orig,I1,I2,ht_params))
 
 	video_obj.save()
-
-
-#print_err()
-
-#from hist import RaisedCos, hist_tree, hist_loss
-
-
-#out_dir = f'outputs/seed_{seed}'
-#if not os.path.exists(out_dir): os.makedirs(out_dir)
- 
-#for i, _ in enumerate(run_alg(I1,I1_orig,I2,ht_params,optim_params,**alg_params)):
-#	if i % n_save == 0:
-#		title = f'Step {i} of {alg_params["n_steps"]}'
-#		savefig(*I_list,title,ht_params,os.path.join(out_dir,f'{i:03d}.png'))
-
-#os.chdir(out_dir)
-#subprocess.call(['convert', '-delay', '30', '*.png', 'out.mp4'])
-
 
