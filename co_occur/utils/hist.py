@@ -20,7 +20,7 @@ def hist_loss(H1,H2): return sum([(2**i)*torch.sum(torch.abs(h1-h2)) for i,(h1,h
 # "bound_inc" dictates whether or not bound is inclusive or exclusive
 class MyFunc:
 	bound = 1
-	bound_inc = True
+	bound_inc = False
 	neigh_dtype = torch.float32	# non-ideal situation, labels must be packed using matmul, which only accepts float on cuda
 
 	def mask(self,x):	# return a mask, indicating for each point if it is in the nonzero neighborhood
@@ -28,8 +28,10 @@ class MyFunc:
 		else: return torch.abs(x) < self.bound
 
 	def neighs(self,x):	# return list of neighbors for each point
-		b = math.ceil(self.bound)
-		return [torch.floor(x-i).type(self.neigh_dtype) for i in range(-b,b+1)]
+#		b = math.ceil(self.bound)
+#		return [torch.floor(x-i).type(self.neigh_dtype) for i in range(-b,b+1)]
+		return [torch.floor(x+i).type(self.neigh_dtype) for i in range(2)]
+
 
 class RaisedCos(MyFunc):
 	def f(self,x): return (1+torch.cos(x*pi))/2*(self.mask(x).type(x.dtype))
@@ -71,7 +73,7 @@ class Hist(torch.autograd.Function):
 
 		labels = labels.transpose(0,2).transpose(1,2)	# premutes axes
 		K = labels.shape[1]
-		
+
 		inds_invalid = ((labels < 0) | (labels >= n_bins)).any(2)	# by default consider all neighbors. Then check if they are outside valid range
 		labels[inds_invalid] = 0					# if invalid, replace with some valid index (I close 1). Later on, these invalid
 										# indices must be remembered, and values associated with them should not be counted

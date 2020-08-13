@@ -21,13 +21,18 @@ def co_occur(X,ht_params): return [hist_tree(X_i,ht_params['n_bins'],1,ht_params
 def round_rand(x): return torch.floor(x + torch.rand(x.shape,dtype=x.dtype,device=x.device))
 
 
-def get_losses(I1_orig,I1,I2):
+#def get_losses(I1_orig,I1,I2):
 
-        X_list = [I.detach() for I in [I1_orig, I1, I2]]
-        C_list = [co_occur(X,ht_params) for X in X_list]
-        img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
-        cc_rmse = torch.sqrt(torch.mean(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])**2))
-        return img_rmse, cc_rmse
+#	X_list = [I.detach() for I in [I1_orig, I1, I2]]
+#	C_list = [co_occur(X,ht_params) for X in X_list]
+#	 img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
+#	 cc_rmse = torch.sqrt(torch.mean(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])**2))
+#	 return img_rmse, cc_rmse
+
+#	img_l1 = torch.mean(torch.abs(X_list[0]-X_list[1]))
+#	cc_l1 = torch.mean(torch.abs(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])))
+#	return img_l1, cc_l1
+
 
 
 def run_alg(I1_orig,I1,I2,ht_params,optim_params,n_steps,sigma,lamb,verbose=False):
@@ -53,9 +58,13 @@ def get_losses(I1_orig,I1,I2,ht_params):
 
 	X_list = [I.detach() for I in [I1_orig, I1, I2]]
 	C_list = [co_occur(X,ht_params) for X in X_list]
-	img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
-	cc_rmse = torch.sqrt(torch.mean(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])**2))
-	return img_rmse, cc_rmse
+#	img_rmse = torch.sqrt(torch.mean((X_list[0]-X_list[1])**2))
+#	cc_rmse = torch.sqrt(torch.mean(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])**2))
+#	return img_rmse, cc_rmse
+
+	img_l1 = torch.mean(torch.abs(X_list[0]-X_list[1]))
+	cc_l1 = torch.mean(torch.abs(torch.stack([C_list[1][i]-C_list[2][i] for i in range(3)])))
+	return img_l1, cc_l1
 
 
 
@@ -65,7 +74,7 @@ def savefig(I1_orig,I1,I2,ht_params,filename='fig.png',title=str()):
 	row_labels = ['Image', 'Red', 'Green', 'Blue']
 	X_list = [I.detach() for I in [I1_orig, I1, I2]]
 	C_list = [co_occur(X,ht_params) for X in X_list]
-	img_rmse, cc_rmse = get_losses(*X_list,ht_params)
+	img_l1, cc_l1 = get_losses(*X_list,ht_params)
 
 	fig,axes = plt.subplots(4,3)
 	for a, X in zip(axes[0],X_list): a.imshow(X.cpu().numpy()/255)
@@ -75,7 +84,7 @@ def savefig(I1_orig,I1,I2,ht_params,filename='fig.png',title=str()):
 	for a in axes.reshape(-1): a.set_xticks([]); a.set_yticks([])
 
 	fig.suptitle(title)
-	fig.text(0.02,0.02,f'Image RMSE: {img_rmse:0.3f}\nCo-Occur RMSE: {cc_rmse:0.3f}',fontsize=14)
+	fig.text(0.02,0.02,f'Image L1 Loss: {img_l1:0.3f}\nCo-Occur L1 Loss: {cc_l1:0.3f}',fontsize=14)
 	fig.set_size_inches(8,8)
 	fig.savefig(filename)
 	plt.close()

@@ -43,6 +43,16 @@ class Identity:
 	def __call__(self,X): return X
 
 
+def hwc2chw(X):
+	if len(X.shape) == 4: return X.transpose((0,3,1,2))
+	else: return X.transpose((2,0,1))
+
+def chw2hwc(X):
+	if len(X.shape) == 4: return X.transpose((0,2,3,1))
+	else: return X.transpose((1,2,0))
+
+
+
 if __name__=='__main__':
 
 	import matplotlib.pyplot as plt
