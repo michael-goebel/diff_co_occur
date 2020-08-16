@@ -4,9 +4,15 @@ import numpy as np
 
 def image_reader(f):
 	try:
-		return np.array(Image.open(f).convert('RGB'))
-	except:
-		print(f'error with file: {f}'); quit()
+		img = Image.open(f).convert('RGB')
+		size = img.size
+		if min(size) < 256:
+			new_size = [max(256,i) for i in size]
+			img = img.resize(new_size)
+		
+		return np.array(img)
+	except Exception as e:
+		print(f'error with file: {f}',e); quit()
 
 
 #	try:
