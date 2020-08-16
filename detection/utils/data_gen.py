@@ -7,7 +7,7 @@ from pre_proc import CenterCrop
 
 class TrainDataGen:
 
-	def __init__(self,files_lists,file_labels,bs_list,n_batch_max,pre_proc_funcs):
+	def __init__(self,files_lists,file_labels,bs_list,pre_proc_funcs):
 		self.files_lists = files_lists
 		self.n_files = np.array([len(f_list) for f_list in files_lists])
 		self.file_labels = np.array(file_labels)
@@ -17,9 +17,9 @@ class TrainDataGen:
 		self.pre_proc_funcs = [image_reader,] + pre_proc_funcs
 
 		self.L = np.min(self.n_files//self.npb)
-		if not n_batch_max is None: self.L = min(n_batch_max,self.L)
+		self.n_batch = self.L
 
-	def __len__(self): return self.L		
+	def __len__(self): return self.n_batch
 
 	def __iter__(self):
 		self.i = 0

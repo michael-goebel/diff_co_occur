@@ -35,7 +35,6 @@ def get_model(name):
 
 
 
-def identity(x): return x
 
 def get_opt_and_loss(model): return (torch.optim.Adam(model.parameters()),torch.nn.CrossEntropyLoss())
 
@@ -43,7 +42,7 @@ def read_txt(fname):
 	with open(fname) as f: return f.read().split('\n')
 
 
-def run_model(model,optimizer,loss_func,data_gen,train,show_pbar=True):
+def run_model(model,optimizer,loss_func,data_gen,train,show_pbar=True,ind_start=0,n_batch=None):
 
 	if train: model.train()
 	else: model.eval()
@@ -53,10 +52,16 @@ def run_model(model,optimizer,loss_func,data_gen,train,show_pbar=True):
 	ng = data_gen.n_group	
 
 	conf = np.zeros((nc,ng))
-	meter = tqdm if show_pbar else identity
+	meter = tqdm if show_pbar else iter
 
-	for x,y,g in meter(data_gen):
+	iterator = meter(data_gen)
+	print(iterator)
+	data_gen.i = ind_start
+	data_gen.n_batch = max_n_batch
 
+	for x,y,g in iterator:
+
+		print(data_gen.i)
 		x_torch = torch.tensor(x).float()
 		y_torch = torch.tensor(y)
 
