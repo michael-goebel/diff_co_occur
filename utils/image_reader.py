@@ -1,5 +1,4 @@
 from PIL import Image
-import webp
 import numpy as np
 
 def image_reader(f):

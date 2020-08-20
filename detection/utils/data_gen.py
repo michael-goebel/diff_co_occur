@@ -15,19 +15,20 @@ class TrainDataGen:
 		self.n_class = max(file_labels) + 1
 		self.n_group = len(files_lists)
 		self.pre_proc_funcs = [image_reader,] + pre_proc_funcs
-
+		self.i = 0
 		self.L = np.min(self.n_files//self.npb)
 		self.n_batch = self.L
+
+	def shuffle(self): self.inds = [np.random.permutation(n) for n in self.n_files]
 
 	def __len__(self): return self.n_batch
 
 	def __iter__(self):
-		self.i = 0
-		self.inds = [np.random.permutation(n) for n in self.n_files]
+		self.start = self.i;
 		return self
 
 	def __next__(self):
-		if self.i < self.L:
+		if self.i < self.start + self.n_batch:
 			inds_list = [ind[b*self.i:b*(self.i+1)] for ind,b in zip(self.inds,self.npb)]
 			x_list = [f[ind_i] for f, ind_l in zip(self.files_lists,inds_list) for ind_i in ind_l]
 			for func in self.pre_proc_funcs: x_list = [func(x_i) for x_i in x_list]
@@ -37,6 +38,7 @@ class TrainDataGen:
 			return np.array(x_list), np.array(y), groups
 
 		else:
+			self.i = 0
 			raise StopIteration()
 
 class TestDataGen:
