@@ -1,0 +1,68 @@
+
+All data sets
+
+Real
+Fake
+
+CC 0.0
+CC 3.0
+CC 10.0
+
+DFT 0.003
+DFT 0.01
+DFT 0.03
+
+PGD CC
+PGD DFT
+PGD DIR
+
+
+
+
+Detectors:
+co-occur
+dft
+direct
+
+
+resnet18:
+
+co-occur (fake)
+co-occur (fake, CC 0.0)
+co-occur (fake, CC 3.0)
+co-occur (fake, CC 10.0)
+co-occur (fake, all CC)
+co-occur (fake, all DFT)
+co-occur (fake, all PGD)
+co-occur (fake, all adv)
+
+dft (fake)
+dft (fake, all CC)
+dft (fake, all DFT)
+dft (fake, all PGD)
+dft (fake, all adv)
+
+dir (fake)
+dir (fake, all CC)
+dir (fake, all DFT)
+dir (fake, all PGD)
+dir (fake, all adv)
+
+
+
+mobilenet
+
+co-occur (fake)
+co-occur (fake, all adv)
+dft (fake)
+dft (fake, all adv)
+dir (fake)
+dir (fake, all adv)
+
+
+
+
+
+
+
+

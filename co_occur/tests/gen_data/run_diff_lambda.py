@@ -29,7 +29,8 @@ ap_list = [{'n_steps': 200, 'sigma': 0.01, 'lamb': lamb},
 
 n_save = 10
 
-data_dir = '/media/ssd1/mike/gan_data_trimmed/'
+old_data_dir = '/media/ssd1/mike/gan_data_trimmed/'
+data_dir = '/media/ssd2/mike/gan_data_trimmed/'
 
 output_dir = f'outputs_3/lambda_{lamb}/{tvt_type}'
 
@@ -48,6 +49,9 @@ with open(data_dir + f'split_files/adv_{tvt_type}_fake.txt') as f: fake_list = f
 
 fake_list = fake_list[start_block:end_block]
 real_list = real_list[start_block:end_block]
+
+fake_list = [f.replace(old_data_dir,data_dir) for f in fake_list]
+real_list = [f.replace(old_data_dir,data_dir) for f in real_list]
 
 
 fake_real_tuples = get_pairs(fake_list, real_list, pre_proc_funcs)

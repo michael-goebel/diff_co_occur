@@ -2,13 +2,11 @@
 
 lambda=0.0
 
-n_gpu=7
+n_gpu=3
 n_per_gpu=2
 
 
 params_list="
-0,933,train
-933,1867,train
 1867,2800,train
 2800,3733,train
 3733,4667,train

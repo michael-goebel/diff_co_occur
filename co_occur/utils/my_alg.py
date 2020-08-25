@@ -12,7 +12,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 
-def img2pairs(X): return [torch.stack((X[:-1,:,i].view(-1),X[1:,:,i].view(-1)),dim=1) for i in range(X.shape[-1])]
+def img2pairs(X): return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]
 
 
 def co_occur(X,ht_params): return [hist_tree(X_i,ht_params['n_bins'],1,ht_params['interp'])[0] for X_i in img2pairs(X)]

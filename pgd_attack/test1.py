@@ -40,10 +40,11 @@ model = get_model(model_name,method).to('cuda')
 #device = model.device
 device = 'cuda'
 
-model = torch.nn.DataParallel(model)
+#model = torch.nn.DataParallel(model)
 
-in_dir = f'../detection/outputs/{method}_{model_name}/'
 
+in_dir = glob(f'../detection/outputs_*/{method}_{model_name}/')[0]
+print(in_dir)
 #print(model.state_dict().keys())
 
 model.load_state_dict(torch.load(in_dir + 'model.h5'))

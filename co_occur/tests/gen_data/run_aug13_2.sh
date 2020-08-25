@@ -1,8 +1,8 @@
 #!/bin/bash
 
-lambda=0.0
+lambda=10.0
 
-n_gpu=7
+n_gpu=5
 n_per_gpu=2
 
 
@@ -25,14 +25,6 @@ params_list="
 14000,14933,train
 14933,15867,train
 15867,16800,train
-0,901,val
-901,1802,val
-1802,2703,val
-2703,3604,val
-0,899,test
-899,1798,test
-1798,2697,test
-2697,3596,test
 "
 
 
