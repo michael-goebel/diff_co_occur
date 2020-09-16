@@ -19,9 +19,9 @@ X1_orig = X1.clone().detach()
 
 X1.requires_grad = True
 
-n_bins = 8
-n_layers = 4
-sigma = 0.001
+n_bins = 4
+n_layers = 3
+sigma = 0.01
 interp = 'raised cos'
 n_steps = 200
 lamb = 0

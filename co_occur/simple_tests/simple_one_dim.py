@@ -10,16 +10,19 @@ from hist import RaisedCos, L1Dist, Hist, hist_tree, hist_loss
 os.environ['CUDA_VISIBLE_DEVICES'] = str()
 
 # X1 is source, X2 is target. Demostrates problem of transporting from 0 to 6
-X1 = torch.tensor([0,0,1,2,3,4,5,6]).view(-1,1).double()
-X2 = torch.tensor([0,1,2,3,4,5,6,6]).view(-1,1).double()
+#X1 = torch.tensor([0,0,1,2,3,4,5,6]).view(-1,1).double()
+#X2 = torch.tensor([0,1,2,3,4,5,6,6]).view(-1,1).double()
+X1 = torch.Tensor([0,1,2]).view(-1,1).double()
+X2 = torch.Tensor([1,2,3]).view(-1,1).double()
+
 X1.requires_grad = True
 
 
-n_bins = 8
-n_layers = 1
-sigma = 0.001
+n_bins = 4
+n_layers = 3
+sigma = 0.01
 interp = 'raised cos'
-n_steps = 200
+n_steps = 2000
 optim_params = {'lr': 0.001, 'momentum': 0.9}
 
 H2 = hist_tree(X2,n_bins,n_layers,interp)
