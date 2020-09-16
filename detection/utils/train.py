@@ -2,7 +2,7 @@ from tqdm import tqdm
 import torch, torchvision, torch.nn as nn
 import numpy as np
 import os
-from torch_pre_proc import CoOccurWithNorm, DFTWithNorm, ImageNetNorm
+from torch_pre_proc import CoOccurWithNorm, DFTWithNorm, ImageNetNorm, CBandCC
 
 
 
@@ -55,6 +55,9 @@ def get_model(name,method,pretrained=True):
 	if method == 'co_occur': pre_proc = CoOccurWithNorm()
 	if method == 'dft': pre_proc = DFTWithNorm()
 	if method == 'direct': pre_proc = ImageNetNorm()
+	if method == 'cband_cc':
+		pre_proc = CBandCC()
+		model.conv1 = torch.nn.Conv2d(6, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
 
 	return nn.Sequential(pre_proc,model)
 

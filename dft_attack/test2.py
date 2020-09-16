@@ -40,12 +40,12 @@ groups = [f.split('/')[-1].split('_')[1] for f in all_lists]
 
 f_pairs = [[read_txt(fi) for fi in [f, f.replace('real.txt','fake.txt')]] for f in all_lists]
 
-out_dir = 'outputs_4/'
+out_dir = 'outputs_6/'
 
 n_max = 10
 
 def read_and_proc(fname): return CenterCrop(256)(image_reader(fname.replace('ssd1','ssd2')))
-
+print(groups)
 
 for group, (files_real, files_fake) in zip(groups,f_pairs):
 
@@ -63,7 +63,7 @@ for group, (files_real, files_fake) in zip(groups,f_pairs):
 			if not os.path.exists(this_dir): os.makedirs(this_dir)
 			img_adv = attack(img_real, img_fake, lamb)
 			image_writer(this_dir + 'output.png', img_adv)
-			with open(this_dir + 'files.txt','w+') as f: f.write(f'{img_fake}\n{img_real}')
+			with open(this_dir + 'files.txt','w+') as f: f.write(f'{f_fake}\n{f_real}')
 
 #			print(this_dir)
 			

@@ -12,7 +12,20 @@ import matplotlib
 matplotlib.use('Agg')
 
 
-def img2pairs(X): return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]
+rgb_pairs = [[0,1],[0,2],[1,2]]
+
+#slices_adj = [[(i,slice(0,-1),slice(0,-1)),(i,slice(1,None),slice(1,None))] for i in range(3)]
+#slices = slices_adj + rgb_pairs
+#out = [(A[s1],A[s2]) for s1, s2 in slices]
+
+
+
+#def img2pairs(X): return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]
+def img2pairs(X):
+	out = [torch.stack((X[:-1,:-1,i].reshape(-1),X[1:,1:,i].reshape(-1)),dim=1) for i in range(3)]
+	out += [torch.stack((X[:,:,i].reshape(-1),X[:,:,j].reshape(-1)),dim=1) for i,j in rgb_pairs]
+	#print([i.shape for i in out])
+	return out
 
 
 def co_occur(X,ht_params): return [hist_tree(X_i,ht_params['n_bins'],1,ht_params['interp'])[0] for X_i in img2pairs(X)]
@@ -53,7 +66,7 @@ def get_losses(I1_orig,I1,I2,ht_params):
 def savefig(I1_orig,I1,I2,ht_params,filename='fig.png',title=str()):
 
 	col_labels = ['Source', 'Solution', 'Target']
-	row_labels = ['Image', 'Red\nCo-Occur', 'Green\nCo-Occur', 'Blue\nCo-Occur']
+	row_labels = ['Image', 'Red', 'Green', 'Blue']
 	X_list = [I.detach() for I in [I1_orig, I1, I2]]
 	C_list = [co_occur(X,ht_params) for X in X_list]
 	img_l1, cc_l1 = get_losses(*X_list,ht_params)

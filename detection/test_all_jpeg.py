@@ -7,7 +7,7 @@ sys.path.append('../utils/')
 sys.path.append('utils/')
 
 
-from pre_proc import CenterCrop, hwc2chw
+from pre_proc import CenterCrop, hwc2chw, JPEGFilter
 from numpy_co_occur import CoOccur, co_occur_normalize
 from numpy_dft import normed_dft
 from imagenet_norm import imagenet_norm
@@ -29,12 +29,12 @@ gpu = sys.argv[3]
 
 os.environ['CUDA_VISIBLE_DEVICES']=gpu
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-pre_proc_funcs = [CenterCrop(256), hwc2chw]
+pre_proc_funcs = [CenterCrop(256), JPEGFilter(75), hwc2chw]
 
 bs_list = [16,16]
 
 
-all_dirs = glob('outputs_4/*/')
+all_dirs = glob('outputs_jpeg/*/')
 
 
 #good_dirs_trim = [d.split('/')[1] for d in good_dirs]
@@ -43,11 +43,11 @@ all_files = get_files('all_adv','test')
 file_groups = ['real', 'GAN'] + unpack_names('all_adv')
 
 file_labels = [0,] + [1,]*10
-
+print(all_dirs)
 
 for i, in_dir in enumerate(all_dirs[ind_start:ind_end]):
 
-	if os.path.exists(in_dir + 'test_results.txt'): continue
+	#if os.path.exists(in_dir + 'test_results.txt'): print('skipping', in_dir); continue
 	print(in_dir)
 	meta_string = in_dir.split('/')[1]
 
