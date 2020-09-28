@@ -3,14 +3,12 @@ import torch
 from glob import glob
 from tqdm import tqdm
 
-sys.path.append('../../utils/')
-sys.path.append('../../../utils/')
-
-from my_alg import run_alg, VideoGen, get_losses, round_rand, savefig
+#from my_alg import run_alg, VideoGen, get_losses, round_rand, savefig
+from my_alg import run_alg, get_losses, round_rand
 from one_d_dist import get_pairs, apply_funcs
 
 from pre_proc import CenterCrop
-from image_reader import image_reader, image_writer
+from image_io import image_reader, image_writer
 
 gpu = sys.argv[1]
 lamb = float(sys.argv[2])
@@ -64,7 +62,7 @@ for fake_img, real_img in tqdm(fake_real_tuples[start_ind:end_ind]):
 	out_dir_i = os.path.join(output_dir,fake_img.split('/')[-1].split('.')[0])
 	if not os.path.exists(out_dir_i): os.mkdir(out_dir_i)
 
-	I1_np, I2_np = [image_reader(f).astype('single') for f in [real_img,fake_img]]
+	I1_np, I2_np = [image_reader(f).astype('single') for f in [fake_img,real_img]]
 	I1_np, I2_np = [apply_funcs(I,pre_proc_funcs) for I in [I1_np,I2_np]]
 
 	I1, I2 = [torch.tensor(i).to(device) for i in [I1_np,I2_np]]
@@ -90,5 +88,8 @@ for fake_img, real_img in tqdm(fake_real_tuples[start_ind:end_ind]):
 	with open(os.path.join(out_dir_i,'loss.txt'),'w') as f: f.write(hist_str)
 	image_writer(os.path.join(out_dir_i,'output.png'),I1.detach().cpu().numpy())
 	with open(os.path.join(out_dir_i,'files.txt'),'w') as f: f.write(f'{fake_img}\n{real_img}')
+
+
+
 
 

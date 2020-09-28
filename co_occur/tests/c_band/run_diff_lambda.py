@@ -92,6 +92,3 @@ for fake_img, real_img in tqdm(fake_real_tuples[start_ind:end_ind]):
 	with open(os.path.join(out_dir_i,'files.txt'),'w') as f: f.write(f'{fake_img}\n{real_img}')
 
 
-
-
-
