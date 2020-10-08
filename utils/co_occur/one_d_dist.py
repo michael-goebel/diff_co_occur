@@ -46,15 +46,17 @@ def get_pairs(f_src, f_tgt, pre_proc_list=list()):
 
 if __name__=='__main__':
 
-	import matplotlib.pyplot as plt
+	data_dir = '../../data/original/'
 
-	real_file = '/home/mike/spring_2020/prelim_cc_tests/train_val_splits/val_real.txt'
-	fake_file = '/home/mike/spring_2020/prelim_cc_tests/train_val_splits/val_fake.txt'
+	real_file = data_dir + 'data_splits/adv_val_real.txt'
+	fake_file = data_dir + 'data_splits/adv_val_fake.txt'
+
 	pre_proc_funcs = [CenterCrop(L),]
 
-	with open(real_file) as f: real_list = f.read().split('\n')
-	with open(fake_file) as f: fake_list = f.read().split('\n')
+	with open(real_file) as f: real_list = [data_dir + i for i in f.read().split('\n')]
+	with open(fake_file) as f: fake_list = [data_dir + i for i in f.read().split('\n')]
 
+	print('List of file pairs:')
 	print(get_pairs(fake_list[:30], real_list[:15], pre_proc_funcs))
 
 

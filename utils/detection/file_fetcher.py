@@ -1,28 +1,28 @@
-
 from glob import glob
+from utils import base_dir
 
 
 def unpack_names(name):
 
-	if name == 'all_cc': return ['cc_0.0', 'cc_3.0', 'cc_10.0']
+	if name == 'all_co': return ['co_0.0', 'co_3.0', 'co_10.0']
 	elif name == 'all_dft': return ['dft_0.003', 'dft_0.01', 'dft_0.03']
-	elif name == 'all_pgd': return ['pgd_cc', 'pgd_dft', 'pgd_dir']
-	elif name == 'all_adv': return sum([unpack_names(n) for n in ['all_cc','all_dft','all_pgd']],[])
+	elif name == 'all_pgd': return ['pgd_co', 'pgd_dft', 'pgd_dir']
+	elif name == 'all_adv': return sum([unpack_names(n) for n in ['all_co','all_dft','all_pgd']],[])
 	elif name == 'none': return list()
 	else: return [name,]
 
 
 def load_fake(tvt):
-	fname = f'/media/ssd2/mike/gan_data_trimmed/split_files/reg_{tvt}_fake.txt'
+	fname = base_dir + f'data/original/data_splits/reg_{tvt}_fake.txt'
 	with open(fname) as f: files = f.read().split('\n')
-	files = [f.replace('ssd1','ssd2') for f in files]
+	files = [base_dir + 'data/original/' + f for f in files]
 	return files
 
 def load_real(tvt):
-        fname = f'/media/ssd2/mike/gan_data_trimmed/split_files/reg_{tvt}_real.txt'
-        with open(fname) as f: files = f.read().split('\n')
-        files = [f.replace('ssd1','ssd2') for f in files]
-        return files
+	fname = base_dir + f'data/original/data_splits/reg_{tvt}_real.txt'
+	with open(fname) as f: files = f.read().split('\n')
+	files = [base_dir + 'data/original/' + f for f in files]
+	return files
 
 class LoadCC:
 	def __init__(self,lamb_str): self.lamb_str = lamb_str
@@ -43,13 +43,13 @@ class LoadPGD:
 load_dict = {
 	'real': load_real,
 	'fake': load_fake,
-	'cc_0.0': LoadCC('0.0'),
-	'cc_3.0': LoadCC('3.0'),
-	'cc_10.0': LoadCC('10.0'),
+	'co_0.0': LoadCC('0.0'),
+	'co_3.0': LoadCC('3.0'),
+	'co_10.0': LoadCC('10.0'),
 	'dft_0.03': LoadDFT('0.03'),
 	'dft_0.01': LoadDFT('0.01'),
 	'dft_0.003': LoadDFT('0.003'),
-	'pgd_cc': LoadPGD('co_occur'),
+	'pgd_co': LoadPGD('co_occur'),
 	'pgd_dft': LoadPGD('dft'),
 	'pgd_dir': LoadPGD('direct')	
 }
@@ -57,7 +57,6 @@ load_dict = {
 def get_files(name,tvt):
 	names = unpack_names(name)
 	names = ['real','fake'] + names
-	#print(names)
 	return [load_dict[n](tvt) for n in names]
 
 

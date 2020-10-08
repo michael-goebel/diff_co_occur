@@ -1,13 +1,11 @@
-
 import numpy as np
-from glob import glob
-
-import sys, os
-sys.path.append('../utils/')
-from pre_proc import CenterCrop
-from image_reader import image_reader, image_writer
+import os
 from random import shuffle
 from tqdm import tqdm
+
+from utils.image.pre_proc import CenterCrop
+from utils.image.image_io import image_reader, image_writer
+
 
 
 f_1d = np.array([-1/2,1,-1/2])
@@ -32,57 +30,35 @@ def attack(img_real, img_fake, lamb):
 	img_out = np.real(np.fft.ifft2(F_out,axes=(0,1),norm='ortho'))
 	return np.round(np.clip(img_out,0,255)).astype('uint8')
 
+in_dir = '../data/original/'
+out_dir = '../data/adversarial/'
 
-data_dir = '/media/ssd2/mike/gan_data_trimmed/split_files/'
+#data_dir = '../data/'
+tvt = ['train', 'val', 'test']
+f_pairs = [[read_txt(in_dir + f'data_splits/adv_{t}_{r}.txt') for r in ['real','fake']] for t in tvt]
 
-all_lists = glob(data_dir + 'adv*real.txt')
-groups = [f.split('/')[-1].split('_')[1] for f in all_lists]
 
-f_pairs = [[read_txt(fi) for fi in [f, f.replace('real.txt','fake.txt')]] for f in all_lists]
+def read_and_proc(fname): return CenterCrop(256)(image_reader(fname))
 
-out_dir = 'outputs_6/'
 
-n_max = 10
-
-def read_and_proc(fname): return CenterCrop(256)(image_reader(fname.replace('ssd1','ssd2')))
-print(groups)
-
-for group, (files_real, files_fake) in zip(groups,f_pairs):
+for group, (files_real, files_fake) in zip(tvt,f_pairs):
 
 	shuffle(files_real)
 	shuffle(files_fake)
 
 	for i, (f_real, f_fake) in enumerate(zip(tqdm(files_real), files_fake)):
 
-		img_real = read_and_proc(f_real)
-		img_fake = read_and_proc(f_fake)
+		img_real = read_and_proc(in_dir + f_real)
+		img_fake = read_and_proc(in_dir + f_fake)
 
 		for lamb in [0.03, 0.01, 0.003]:
 
-			this_dir = out_dir + f'{group}/lambda_{lamb}/{i:05d}/'
+			this_dir = out_dir + f'dft_gb/lambda_{lamb}/{group}/{i:05}/'
+
 			if not os.path.exists(this_dir): os.makedirs(this_dir)
 			img_adv = attack(img_real, img_fake, lamb)
 			image_writer(this_dir + 'output.png', img_adv)
 			with open(this_dir + 'files.txt','w+') as f: f.write(f'{f_fake}\n{f_real}')
-
-#			print(this_dir)
-			
-
-
-#	print(len(files_real), len(files_fake))
-
-
-
-
-
-#files_real = read_txt(data_dir + 'adv_train_real.txt')
-#files_fake = read_txt(data_dir + 'adv_train_fake.txt')
-
-#img_real = image_reader(files_real[1].replace('ssd1','ssd2'))
-#img_fake = image_reader(files_fake[1].replace('ssd1','ssd2'))
-
-#img_adv = attack(img_real, img_fake, 0.003)
-
 
 
 

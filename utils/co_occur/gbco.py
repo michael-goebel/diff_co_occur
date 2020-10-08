@@ -9,13 +9,23 @@ import matplotlib.pyplot as plt
 from utils.co_occur.hist import hist_tree, hist_loss
 
 
-def img2pairs(X): return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]
+def img2pairs(X,ch_first=False):
+	if ch_first: return [torch.stack((X[i,:-1].reshape(-1),X[i,1:].reshape(-1)),dim=1) for i in range(X.shape[0])]
+	else: return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]	
+
 
 rgb_pairs = [[0,1],[0,2],[1,2]]
-def img2pairs_cband(X):
-        out = [torch.stack((X[:-1,:-1,i].reshape(-1),X[1:,1:,i].reshape(-1)),dim=1) for i in range(3)]
-        out += [torch.stack((X[:,:,i].reshape(-1),X[:,:,j].reshape(-1)),dim=1) for i,j in rgb_pairs]
-        return out
+def img2pairs_cband(X,ch_first=False):
+	if ch_first:
+		out = [torch.stack((X[i,:-1,:-1].reshape(-1),X[i,1:,1:].reshape(-1)),dim=1) for i in range(3)]
+		out += [torch.stack((X[i].reshape(-1),X[j].reshape(-1)),dim=1) for i,j in rgb_pairs]
+		return out
+	else:
+		out = [torch.stack((X[:-1,:-1,i].reshape(-1),X[1:,1:,i].reshape(-1)),dim=1) for i in range(3)]
+		out += [torch.stack((X[:,:,i].reshape(-1),X[:,:,j].reshape(-1)),dim=1) for i,j in rgb_pairs]
+		return out
+	
+
 
 
 def co_occur(X,ht_params): return [hist_tree(X_i,ht_params['n_bins'],1,ht_params['interp'])[0] for X_i in img2pairs(X)]
