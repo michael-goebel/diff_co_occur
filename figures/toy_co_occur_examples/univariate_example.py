@@ -1,10 +1,10 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-#import sys, os
+import os
 
-sys.path.append('../utils/')
-from hist import RaisedCos, L1Dist, Hist, hist_tree
+from utils.co_occur.hist import Hist, hist_tree
+
 
 def hist_loss_L1(H1,H2): return sum([(2**i)*torch.sum(torch.abs(h1-h2)) for i,(h1,h2) in enumerate(zip(H1,H2))])
 def hist_loss_L2(H1,H2): return sum([(2**i)*torch.sum((h1-h2)**2)**(1/2) for i,(h1,h2) in enumerate(zip(H1,H2))])
@@ -15,7 +15,6 @@ os.environ['CUDA_VISIBLE_DEVICES'] = str()
 X1 = torch.tensor([1,2,3]).view(-1,1).double()
 X2 = torch.tensor([2,3,4]).view(-1,1).double()
 X1.requires_grad = True
-
 
 params_list = [[hist_loss_L1, 1, 'L1'], [hist_loss_L2, 1, 'L2'], [hist_loss_L1, 3, 'L1 Pyramid']]
 

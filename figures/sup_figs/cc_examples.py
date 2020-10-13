@@ -1,17 +1,13 @@
-import sys
-sys.path.append('../co_occur/utils/')
-sys.path.append('../utils/')
-
 from glob import glob
-from image_reader import image_reader
 import torch
-from pre_proc import CenterCrop
 import matplotlib.pyplot as plt
-
 import itertools
 import numpy as np
 
-from my_alg import co_occur, get_losses
+from utils.image.image_io import image_reader
+from utils.pre_proc import CenterCrop
+from utils.co_occur.gbco import co_occur, get_losses
+
 
 def act(x): return np.sign(x)*np.log(0.05+np.abs(x))
 
@@ -22,18 +18,13 @@ def norm_cc(X):
 
 
 def savefig(I1_orig,I1,I2,ht_params,filename='fig.png',title=str()):
-
 	col_labels = ['Source', 'Solution', 'Target']
 	row_labels = ['Image', 'Red\nCo-Occur', 'Green\nCo-Occur', 'Blue\nCo-Occur']
 	X_list = [I.detach() for I in [I1_orig, I1, I2]]
 	C_list = [co_occur(X,ht_params) for X in X_list]
-
 	delta_C = [C_list[i][1] - C_list[i][2] for i in range(3)]
-
 	fig, axes = plt.subplots(1,3)
-
 	for i in range(3): axes[i].imshow(act(delta_C[i]))
-
 	plt.savefig('foo.png')
 	plt.close()
 
@@ -45,21 +36,17 @@ def file2torch(fname):
 
 
 def get_imgs(dname):
-	
 	f_adv = dname + 'output.png'
 	with open(dname + 'files.txt') as f: f_fake, f_real = f.read().replace('ssd1','ssd2').split('\n')
-
 	X_list = [file2torch(f) for f in [f_fake,f_adv,f_real]]
-	
-	#X_list = [I.detach() for I in [I1_orig, I1, I2]]
 	C_list = [co_occur(X,ht_params)[0] for X in X_list]
 	X_list = [X/255 for X in X_list]
-
 	return [X.numpy() for X in X_list + C_list]
 
 
-lamb = sys.argv[1]
 
+
+lamb = sys.argv[1]
 
 d_list = glob(f'/media/ssd2/mike/outputs_3/lambda_{lamb}/*/*/')
 

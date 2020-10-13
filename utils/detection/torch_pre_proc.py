@@ -1,5 +1,6 @@
-from utils.co_occur.hist import Hist
 import torch
+
+from utils.co_occur.hist import Hist
 from utils.co_occur.gbco import img2pairs, img2pairs_cband
 
 
@@ -13,11 +14,9 @@ class CoOccurWithNorm(torch.nn.Module):
 		super(CoOccurWithNorm,self).__init__()
 		self.pairs_func = img2pairs_cband if cband else img2pairs
 	def forward(self,X):
-		print(X.shape)
 		C = torch.stack([torch.stack([Hist.apply(pairs,256,'raised cos') for pairs in self.pairs_func(X_i,ch_first=True)]) for X_i in X])
 		v_max = torch.max(torch.max(C,2)[0],2)[0].float()
 		C_out = C.float() / v_max[:,:,None,None]
-		print(C_out.shape)
 		return C_out
 
 

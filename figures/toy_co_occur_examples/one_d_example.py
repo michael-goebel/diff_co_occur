@@ -1,11 +1,9 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-import sys, os
+import os
 
-sys.path.append('../utils/')
-from hist import RaisedCos, L1Dist, Hist, hist_tree, hist_loss
-
+from utils.co_occur.hist import hist_tree, hist_loss 
 
 os.environ['CUDA_VISIBLE_DEVICES'] = str()
 
@@ -16,15 +14,10 @@ X1.requires_grad = True
 torch.manual_seed(1234)
 
 n_bins = 8
-#n_layers = 3
-#sigma = 0.01
 interp = 'raised cos'
 n_steps = 1000
 optim_params = {'lr': 0.001, 'momentum': 0.9}
 
-#H2 = hist_tree(X2,n_bins,n_layers,interp)
-#optimizer = torch.optim.SGD((X1,),**optim_params)
-#X_list = list()
 
 fig, axes = plt.subplots(2,2)
 

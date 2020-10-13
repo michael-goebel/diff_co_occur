@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from utils.co_occur.hist import hist_tree, hist_loss
 
 
+
 def img2pairs(X,ch_first=False):
 	if ch_first: return [torch.stack((X[i,:-1].reshape(-1),X[i,1:].reshape(-1)),dim=1) for i in range(X.shape[0])]
 	else: return [torch.stack((X[:-1,:,i].reshape(-1),X[1:,:,i].reshape(-1)),dim=1) for i in range(X.shape[-1])]	

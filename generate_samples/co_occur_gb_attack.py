@@ -4,14 +4,13 @@ from tqdm import tqdm
 
 from utils.image.pre_proc import CenterCrop
 from utils.image.image_io import image_reader, image_writer
-
 from utils.co_occur.one_d_dist import get_pairs, apply_funcs
 from utils.co_occur.gbco import run_alg, get_losses, round_rand
 
 tvt = ['train','val','test']
 
 parser = argparse.ArgumentParser(description="Generate gray-box co-occurrence attack samples")
-parser.add_argument('--gpu_id',help='Index of gpu to use.')
+parser.add_argument('--gpu_id',default='None',help='Index of gpu to use.')
 parser.add_argument('--data_split',help=f'Which data split to use. Should be one of {tvt}.')
 parser.add_argument('--lamb',type=float,help=f'Lambda constant, discussed in the paper.')
 parser.add_argument('--block',help='Comma-separated start and \
@@ -27,7 +26,8 @@ parser.add_argument('--cband',action='store_true',help='Runs algorithm using cro
 args = parser.parse_args()
 
 
-print(args.reverse, args.cband)
+if args.gpu_id in ['None','none','-1']: gpu = str()
+else: gpu = args.gpu_id
 
 
 start_ind, end_ind = [int(i) for i in args.inds.split(',')]
@@ -51,11 +51,11 @@ print(out_dir)
 
 if not os.path.exists(out_dir): os.makedirs(out_dir)
 
-ht_params = {'n_layers': 9, 'n_bins': 256, 'interp': 'raised cos'}
+ht_params = {'n_layers': 9, 'n_bins': 256, 'interp': 'parabolas'}
 optim_params = {'lr': 0.01, 'momentum': 0.9}
 pre_proc_funcs = [CenterCrop(256),]
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
+os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 
 with open(in_dir + f'data_splits/adv_{tvt_type}_real.txt') as f: real_list = f.read().split('\n')
 with open(in_dir + f'data_splits/adv_{tvt_type}_fake.txt') as f: fake_list = f.read().split('\n')

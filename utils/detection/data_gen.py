@@ -14,7 +14,6 @@ class SingleDataGen:
 	def __len__(self): return len(self.files)
 
 	def __getitem__(self,i):
-		print(i)
 		x = self.files[i]
 		for f in self.pre_proc: x = f(x)
 		return x.astype('float'), self.labels[i], self.groups[i]
@@ -26,7 +25,6 @@ def stack_data_lists(f_lists, label_lists):
 	groups = np.hstack([i*np.ones(len(f)) for i,f in enumerate(f_lists)])
 	files = sum(f_lists,[])
 	inds = np.split(np.arange(len(files)),np.cumsum(counts)[:-1])
-	print(labels.shape)
 	return files, labels, groups, inds
 
 

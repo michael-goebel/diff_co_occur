@@ -65,11 +65,15 @@ if __name__=='__main__':
 	for k, v in load_dict.items():
 		print(k)
 		for tvt in ['train', 'val', 'test']:
-			l = v(tvt)
-			print(tvt, len(l), l[0])
+			try:
+				l = v(tvt)
+				print(tvt, len(l), l[0])
+			except:
+				print(f'No files found for {k} {tvt}')
 
-	f_list = get_files('all_adv','val')
-	print([len(i) for i in f_list])
+
+	#f_list = get_files('all_adv','val')
+	#print([len(i) for i in f_list])
 	
 
 

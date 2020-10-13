@@ -41,8 +41,17 @@ class L1Dist(MyFunc):
 	def f(self,x): return (1-torch.abs(x))*( (x < self.bound).type(x.dtype) + (x <= self.bound).type(x.dtype))/2
 	def df(self,x): return torch.sign(-x)*((torch.abs(x) < self.bound).type(x.dtype)+(torch.abs(x) <= self.bound).type(x.dtype))/2
 
+class Parabolas(MyFunc):
+	def f(self,x):
+		xa = 2*torch.abs(x) - 1
+		return 0.5*(xa*(torch.abs(xa)-2)+1)
+	def df(self,x):
+		xa = 2*torch.abs(x) - 1
+		return 2*torch.sign(x)*(torch.abs(xa)-1)
 
-interp_dict = {'raised cos': RaisedCos(), 'L1 dist': L1Dist()}
+
+
+interp_dict = {'raised cos': RaisedCos(), 'L1 dist': L1Dist(), 'parabolas': Parabolas()}
 
 
 class Hist(torch.autograd.Function):

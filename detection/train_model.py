@@ -19,39 +19,33 @@ parser.add_argument('--jpeg_q',default=None,help='Leave as \"None\" for no JPEG 
 parser.add_argument('--method',help=f'Pre-processing step before CNN. One of {all_methods}.')
 parser.add_argument('--model',help=f'CNN name. See utils/detection/load_model.py for all \
 		available models')
-parser.add_argument('--data_group',help=f'Denotes the adversarial files to include for training. \
+parser.add_argument('--adv_data',default='none',help=f'Denotes the adversarial files to include for training. \
 		For example, none, co_3.0, all_dft, or all_adv')
 args = parser.parse_args()
 
+if args.gpu_id in ['-1','none','None']: gpu = str()
+else: gpu = args.gpu_id
 
-os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
+os.environ['CUDA_VISIBLE_DEVICES'] = gpu
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 pre_proc_funcs = [CenterCrop(256), hwc2chw]
 if args.jpeg_q is not None: pre_proc_funcs = [JPEGFilter(args.jpeg_q),] + pre_proc_funcs
 
 
-bs_real = 20 if args.data_group == 'all_adv' else 16
+bs_real = 20 if args.adv_data == 'all_adv' else 16
 
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu_id
 
-
-#n_fake = len(files_lists_tr) - 1
-#l_labels = [0,] + [1,]*n_fake
-#bs_list = [bs_real,] + [bs_real//n_fake]*n_fake
-
-tr_dg = get_data_gen(args.data_group,'train',pre_proc_funcs,args.n_cpu)
-va_dg = get_data_gen(args.data_group,'val',pre_proc_funcs,args.n_cpu)
+tr_dg = get_data_gen(args.adv_data,'train',pre_proc_funcs,args.n_cpu)
+va_dg = get_data_gen(args.adv_data,'val',pre_proc_funcs,args.n_cpu)
 
 model = get_model(args.model,args.method,not(args.random_init)).to(device)
-model_parallel = model if len(args.gpu_id.split(','))==1 else torch.nn.DataParallel(model)
+model_parallel = model if len(gpu.split(','))==1 else torch.nn.DataParallel(model)
 optimizer, loss_func = get_opt_and_loss(model_parallel)
 
-
-#out_dir = f'outputs_4/{method}_{model_name}_{data_group}/'
-
-out_dir = f'../models/{args.method}_{args.model}_{args.data_group}_JPEG_{args.jpeg_q}_\
-		rand_init_{args.random_init}/'
+out_dir = f'../models/{args.method}_{args.model}_ADV_DATA_{args.adv_data}_JPEG_{str(args.jpeg_q).lower()}_' \
+		+ f'RAND_INIT_{str(args.random_init).lower()}/'
 
 
 

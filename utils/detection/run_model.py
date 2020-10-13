@@ -28,8 +28,6 @@ def run_model(model,optimizer,loss_func,data_gen,train,show_pbar=True,ind_start=
 
 	for x,y,g in iterator:
 
-		#x_torch = torch.tensor(x).float().to(device)
-		#y_torch = torch.tensor(y).to(device)
 		x = x.to(device)
 		y = y.long().to(device)
 
